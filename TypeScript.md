@@ -8,11 +8,17 @@ TypeScript is typed superset of JavaScript originally developed by Microsoft. It
 
 TypeScript also implements modern language features so it is very important to draw the distinction between what is TS and what is ES-next.
 
-#### Motivation
+#### Motivation for TypeScript
 
 In terms of value types, JavaScript is pretty limited. It has six primitive types such as string, number, null, etc. and then everything else extends from Object. And even though the language has some types, it is a mutable type and you cannot specify a type upon variable instantiation. This makes it harder to reason about our code because we or anyone else can change the type of a variable at any time, potentially breaking code down later on in the pipeline. It also makes code more self-documenting because when we read code for the first time, we know what type a variable or parameter is supposed to be.
 
 Put fancily in a one-liner, the power of types is that it makes code more expressive of our intent. Not only that, it works to enforce that intent through preventing type coercions and reassignments. That being said, it is important not to over-type your code. It is designed to enforce constraints, and overly constraining your code can actually make it harder to work with.
+
+## Attribution
+
+All of the material contained in this document has been derived from the following sources:
+ - [The official TypeScript website](https://www.typescriptlang.org/index.html)
+ - The [Front-end Masters](www.frontendmasters.com) workshop on TypeScript, presented by [Mike North](https://github.com/mike-north). Many of the exercises in these notes are pulled directly from this source. I would highly recommend checking it out as Mike explains concepts at a much deeper level than I take notes on here.
 
 ## How it Works
 
@@ -37,6 +43,8 @@ function login(username: string, password: string) : User {
   //do something and return a User object
 }
 ```
+
+*At this point you should scroll down and complete Exercise 1*
 
 ## Object Shape
 
@@ -75,6 +83,21 @@ interface Car {
   year: any //wildcard type
 }
 ```
+
+*At this point you should scroll down and complete Exercise 2*
+
+## Interview Questions
+
+I like including this section in addition to the exercises because I believe you don't truly know something until you are able to explain and/or teach it to another person. I also believe that in order to completely understand a solution to a problem, you have to understand why the problem exists in the first place. For that reason, these will all be open-ended questions, aimed at breaking down the core problems TypeScript solves, and meant to facilitate discussion isntead of being trivia-like.
+
+#### Questions
+
+1. Explain the typing system in vanilla JavaScript. What are its strengths and weaknesses?
+2. Discuss the advantages of typed programming languages.
+3. Explain the difference between a nominal type-checking system and a structural type-checking system.
+4. Explain the difference between implicit and explicit type declaration in TypeScript.
+5. What are three ways to perform explicit type declaration in TypeScript?
+6. Give an example (or a few) of when and how interfaces can be used in TypeScript
 
 ## Exercises
 
@@ -118,7 +141,7 @@ Then implement the two blank functions to convert from a hex string to a rgb obj
 
 Convert the code of the solution to Exercise 1 to use an interface for the RGB object instead of listing out the properties every time.
 
-## Solutions
+## Exercise Solutions
 
 #### Exercise 1 Solution
 
@@ -197,3 +220,4 @@ let color = {
 console.log(rgbToHex({ r: 255, g: 100, b: 55})); //should be "ff6437"
 console.log(hexToRgb('00ff00')); //should be {r: 0, g: 255, b: 0}
 ```
+
