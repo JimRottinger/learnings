@@ -84,7 +84,144 @@ interface Car {
 }
 ```
 
+For an example of when interfaces would be very useful, let's talk about a front-end application in which we have two types of users, regular users and admins. Users and admins are very similar, except that admins have a few special properties that users do not have. In this case, an Admin interface can extend the User interface and add a few additional properties. Then, for all functions that take in a User as a parameter, we could pass in an Admin instead because Admins are supersets of Users. Similarly, a function that takes in an admin would reject a normal user because a user does not fit the full shape of a Admin.
+
+```js
+interface User {
+  email: string;
+  password: string;
+}
+
+interface Admin extends User {
+  adminSince: Date; //any constructor can be a type
+  hasBanHammer: boolean;
+}
+```
+
+#### Type Aliases
+
+Sometimes, creating an entire iterface isn't necessary to define a structure. In these cases, the `type` keyword can be used to define a type alias.
+
+```
+type RGBColor = [number, number, number];
+let red: RGBColor = [255, 0, 0];
+```
+
 *At this point you should scroll down and complete Exercise 2*
+
+## Classes & Property Types
+
+As soon as we start mentioning interfaces and extends (inheritance), we have to include a discussion on Classes. ES6 introduced the Class syntax in JavaScript, so how does TypeScript tie into that? Let's start off with an example of a class.
+
+```js
+class Car {
+  constructor(make, model) {
+    this.make = make;
+    this.model = model;
+  }
+
+  toJSON() {
+    return {
+      make: this.make,
+      model: this.model
+    }
+  }
+}
+
+class Truck extends Car {
+  constructor(make, model, numWheels) {
+    super(make, model);
+    this.numWheels = numWheels;
+  }
+
+  toJSON() {
+    let properties = super.toJSON();
+    properties.numWheels = this.numWheels;
+
+    return properties;
+  }
+}
+
+let myTruck = new Truck('Ford', 'F150', 6);
+
+console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
+```
+
+In this example, we see the class Truck extending a base-class Car. In this Truck's function, we use the keyword `super` to call up to the Car's functions. We can also see that Class's constructor defines its shape as well. We can use TypeScript to mark this up with types.
+
+```
+class Car {
+  make: string
+  model: string
+  constructor(make:string, model:string) {
+    this.make = make;
+    this.model = model;
+  }
+
+  toJSON() {
+    return {
+      make: this.make,
+      model: this.model
+    }
+  }
+}
+
+class Truck extends Car {
+  numWheels: number
+  constructor(make:string, model:string, numWheels:number) {
+    super(make, model);
+    this.numWheels = numWheels;
+  }
+
+  toJSON() {
+    let properties = super.toJSON();
+    properties.numWheels = this.numWheels;
+
+    return properties;
+  }
+}
+
+let myTruck = new Truck('Ford', 'F150', 6);
+
+console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
+```
+Be sure to add type annotations to both the properties and the construction arguments.
+
+#### Enumns
+
+It is pretty common to want to constrain the possible values of a property to a specific set of values. For this case, TypeScript defines the `enum` keyword. `enum` is used to define a type consisting of ordered members.
+
+```js
+enum ShippingStatus {
+  Pending,
+  BeingPrepared,
+  Shipped,
+  Delivered
+};
+
+class Order {
+  shippingStatus: ShippingStatus
+
+  constructor(shippingStatus:ShippingStatus) {
+    this.shippingStatus = shippingStatus;
+  }
+}
+```
+
+#### Arrays
+
+In vanilla JavaScript, it is possible to have an array with a mixed bag of types such as `[1,2,'not a number']`. With TypeScript, it is possible to constrain an array to a single type.
+
+```js
+let nums: number[] = [1,2,3];
+```
+
+There is a special type of an array called a **tuple**. A tuple is an array of fixed length, usually in a specific order with a specific type for each value. In that sense, they are a lot like objects, but they can shine when used in combination with destructuring. Here is an example of an array of array of dependencies where each value is an array with a package name and a version number.
+
+```
+let dependencies: [string, number][] = [];
+```
+
 
 ## Interview Questions
 
@@ -142,6 +279,8 @@ Then implement the two blank functions to convert from a hex string to a rgb obj
 Convert the code of the solution to Exercise 1 to use an interface for the RGB object instead of listing out the properties every time.
 
 ## Exercise Solutions
+
+For all of these exercises, I would recommend use the [TypeScript playground](https://www.typescriptlang.org/play/) website.
 
 #### Exercise 1 Solution
 
