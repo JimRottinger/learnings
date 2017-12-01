@@ -102,10 +102,12 @@ interface Admin extends User {
 
 Sometimes, creating an entire iterface isn't necessary to define a structure. In these cases, the `type` keyword can be used to define a type alias.
 
-```
+```js
 type RGBColor = [number, number, number];
 let red: RGBColor = [255, 0, 0];
 ```
+
+Types can be exported, just like interfaces, so they can be included wherever they are needed.
 
 *At this point you should scroll down and complete Exercise 2*
 
@@ -149,7 +151,7 @@ console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
 
 In this example, we see the class Truck extending a base-class Car. In this Truck's function, we use the keyword `super` to call up to the Car's functions. We can also see that Class's constructor defines its shape as well. We can use TypeScript to mark this up with types.
 
-```
+```js
 class Car {
   make: string
   model: string
@@ -187,7 +189,7 @@ console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
 ```
 Be sure to add type annotations to both the properties and the construction arguments.
 
-#### Enumns
+#### Enums
 
 It is pretty common to want to constrain the possible values of a property to a specific set of values. For this case, TypeScript defines the `enum` keyword. `enum` is used to define a type consisting of ordered members.
 
@@ -222,6 +224,9 @@ There is a special type of an array called a **tuple**. A tuple is an array of f
 let dependencies: [string, number][] = [];
 ```
 
+## Functions
+
+Up to this point, we have been talking about TypeScript in terms of defining object or class structure, but what about functions?
 
 ## Interview Questions
 
