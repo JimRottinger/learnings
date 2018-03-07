@@ -289,3 +289,23 @@ Often we will want to put some kind of constraint on a generic in that in can ac
 function midpoint<T extends Point2D>(p1: T, p2: T): T {
   return new Point2D(p1.x - p2.x, p1.y, p2.y);
 }
+```
+
+In this example, T can still be anything so long as it conforms to the object shape of `Point2D`.
+
+#### Generic Classes
+
+Generic classes have a generic type parameter list in angle brackets (<>) following the name of the class.
+
+```js
+class GenericNumber<T> {
+    zeroValue: T;
+    add: (x: T, y: T) => T;
+}
+
+let myGenericNumber = new GenericNumber<number>();
+myGenericNumber.zeroValue = 0;
+myGenericNumber.add = function(x, y) { return x + y; };
+```
+
+When you instantiate a generic class, you are supplying the type for the for that instance of the class to use. In this sense, the type(s) basically act like an argument to the constructor of your class.
