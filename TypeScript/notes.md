@@ -44,7 +44,7 @@ function login(username: string, password: string) : User {
 }
 ```
 
-*At this point you should scroll down and complete Exercise 1*
+*At this point you should should be able to complete exercise 1 in the exercises file.*
 
 ## Object Shape
 
@@ -109,7 +109,7 @@ let red: RGBColor = [255, 0, 0];
 
 Types can be exported, just like interfaces, so they can be included wherever they are needed.
 
-*At this point you should scroll down and complete Exercise 2*
+*At this point you should be able to complete exercise 2.*
 
 ## Classes & Property Types
 
@@ -228,140 +228,4 @@ let dependencies: [string, number][] = [];
 
 Up to this point, we have been talking about TypeScript in terms of defining object or class structure, but what about functions?
 
-## Interview Questions
-
-I like including this section in addition to the exercises because I believe you don't truly know something until you are able to explain and/or teach it to another person. I also believe that in order to completely understand a solution to a problem, you have to understand why the problem exists in the first place. For that reason, these will all be open-ended questions, aimed at breaking down the core problems TypeScript solves, and meant to facilitate discussion isntead of being trivia-like.
-
-#### Questions
-
-1. Explain the typing system in vanilla JavaScript. What are its strengths and weaknesses?
-2. Discuss the advantages of typed programming languages.
-3. Explain the difference between a nominal type-checking system and a structural type-checking system.
-4. Explain the difference between implicit and explicit type declaration in TypeScript.
-5. What are three ways to perform explicit type declaration in TypeScript?
-6. Give an example (or a few) of when and how interfaces can be used in TypeScript
-
-## Exercises
-
-#### Exercise 1
-
-To start, copy the following code into a JS file.
-
-```js
-//should take in an objects with an r,g,and b property and return the hex string
-function rgbToHex(/*Implement*/) {
-  //implement
-}
-
-//should take in a 6 digit hex string and return an object with the properties r, g, and b
-function hexToRgb(/*Implement*/) {
-  //implement
-}
-
-let color = {
-  r: 255,
-  g: 0,
-  b: 0,
-  get hex() : string {
-    return rgbToHex(this.r, this.g, this.b);
-  },
-  set hex(hex: string) {
-    let { r, g, b } = hexToRgb(hex);
-    this.r = r;
-    this.g = g;
-    this.b = b;
-  }
-};
-
-console.log(rgbToHex(255,100,55)); //should be "ff6437"
-console.log(hexToRgb('00ff00')); //should be {r: 0, g: 255, b: 0}
-```
-
-Then implement the two blank functions to convert from a hex string to a rgb object and vise-versa. Don't worry about covering every edge case such as if we are based in invalid string. Just implement a basic function with the correct type constraints.
-
-#### Exercise 2
-
-Convert the code of the solution to Exercise 1 to use an interface for the RGB object instead of listing out the properties every time.
-
-## Exercise Solutions
-
-For all of these exercises, I would recommend use the [TypeScript playground](https://www.typescriptlang.org/play/) website.
-
-#### Exercise 1 Solution
-
-```js
-//should take in an objects with an r,g,and b property and return the hex string
-function rgbToHex(r: number, g: number, b: number) : string {
-    return r.toString(16) + g.toString(16) + b.toString(16);
-}
-
-//should take in a 6 digit hex string and return an object with the properties r, g, and b
-function hexToRgb(hexString: string) : { r: number, g: number, b: number } {
-    return {
-        r: parseInt(hexString.substr(0,2), 16),
-        g: parseInt(hexString.substr(2,2), 16),
-        b: parseInt(hexString.substr(4,2), 16)
-    };
-}
-
-let color = {
-  r: 255,
-  g: 0,
-  b: 0,
-  get hex() : string {
-    return rgbToHex(this.r, this.g, this.b);
-  },
-  set hex(hex: string) {
-    let { r, g, b } = hexToRgb(hex);
-    this.r = r;
-    this.g = g;
-    this.b = b;
-  }
-};
-
-console.log(rgbToHex(255,100,55)); //should be "ff6437"
-console.log(hexToRgb('00ff00')); //should be {r: 0, g: 255, b: 0}
-```
-
-#### Exercise 2 Solution
-
-```js
-interface RGBObject {
-    r: number,
-    g: number,
-    b: number
-}
-
-//should take in an objects with an r,g,and b property and return the hex string
-function rgbToHex(rgb: RGBObject) : string {
-    return rgb.r.toString(16) + rgb.g.toString(16) + rgb.b.toString(16);
-}
-
-//should take in a 6 digit hex string and return an object with the properties r, g, and b
-function hexToRgb(hexString: string) : RGBObject {
-    return {
-        r: parseInt(hexString.substr(0,2), 16),
-        g: parseInt(hexString.substr(2,2), 16),
-        b: parseInt(hexString.substr(4,2), 16)
-    };
-}
-
-let color = {
-  r: 255,
-  g: 0,
-  b: 0,
-  get hex() : string {
-      return rgbToHex({ r: this.r, g: this.g, b: this.b });
-  },
-  set hex(hex: string) {
-    let { r, g, b } = hexToRgb(hex);
-    this.r = r;
-    this.g = g;
-    this.b = b;
-  }
-};
-
-console.log(rgbToHex({ r: 255, g: 100, b: 55})); //should be "ff6437"
-console.log(hexToRgb('00ff00')); //should be {r: 0, g: 255, b: 0}
-```
 
