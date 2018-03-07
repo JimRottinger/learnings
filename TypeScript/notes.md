@@ -226,6 +226,66 @@ let dependencies: [string, number][] = [];
 
 ## Functions
 
-Up to this point, we have been talking about TypeScript in terms of defining object or class structure, but what about functions?
+Up to this point, we have been talking about TypeScript in terms of defining object or class structure, but what about functions? Well, functions have a type just like any other value. It's function signature defines its expected arguments, the types of those arguments, and the return value of the function. Here is how you define a function type:
 
+```js
+let login: (username: string, password: string) => User;
+```
 
+Just as we saw above, in addition to types, we can also define the interface of a function.
+
+```js
+interface ClickListener {
+  (this: Window, e: MouseEvent): void
+}
+
+const myListener: ClickListener = function(e) {
+  console.log(e);
+}
+```
+
+One super interesting thing to note about the above code example is that we can actually check the type of `this` for a function. For the `ClickListener` interface, we expect `this` to be a Window object. This prevents us from calling `myListener` directly. It has to be called in context of a Window.
+
+#### Function Arguments
+
+Unless you say otherwise, TypeScript assumes every argument in the function is required. Here is an example of how to make an optional argument in TypeScript:
+
+```js
+function createUser(name: String, email: String, profileUrl ?: URL)
+```
+
+What this implies is that the type of profileUrl is `URL | null`. Then, if you tried to assign profileUrl to a variable of type `URL`, it will not work because profileUrl could potentially be null and you cannot assign null to a variable of type URL. This prevents us from making bad assumption about our arguments.
+
+## Generics
+
+Generics are a TypeScript-only construct because they have everything to do with types. Generics allow us to reuse code across many types, interfaces, and functions. Consider the following code example:
+
+```js
+function gimmieFive<T>(x: T): T[] {
+  return [x,x,x,x,x];
+}
+let threes: number[] = gimmieFive(3);
+let eggs: string[] = gimmieFive('egg');
+```
+
+In this example, `T` is a generic whose type is determined inplicitly by the argument that is passed into the `gimmieFive` function. If you pass in 3, T will be number and if you pass in 'egg', T will be string. It should be noted there is nothing special about the T. T could be anything.
+
+```js
+function gimmieFive<SomeGenericName>(x: SomeGenericName): SomeGenericName[] {
+  return [x,x,x,x,x];
+}
+let threes: number[] = gimmieFive(3);
+let eggs: string[] = gimmieFive('egg');
+
+console.log(threes);
+console.log(eggs);
+```
+
+#### Constraints on Generics
+
+Often we will want to put some kind of constraint on a generic in that in can accept some things but not all things.
+
+```js
+function midpoint<T extends Point2D>(p1: T, p2: T): T {
+  return new Point2D(p1.x - p2.x, p1.y, p2.y);
+}
