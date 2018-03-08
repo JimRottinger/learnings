@@ -4,7 +4,7 @@ This repository contains a collection of the notes I take as I learn various tec
 
 ## AngularJS
 
-These notes pertain to Angular 1.x and not the newer Angular. To learn AngularJS, I worked through the Build Your Own Angular book by Tero Parviainen
+These notes pertain to Angular 1.x and not the newer Angular. To learn AngularJS, I worked through the Build Your Own Angular book by Tero Parviainen. You can find the code for that [here](https://github.com/JimRottinger/build-your-own-angular).
 
 - Build Your Own Angular
   - Part 1: Scopes
