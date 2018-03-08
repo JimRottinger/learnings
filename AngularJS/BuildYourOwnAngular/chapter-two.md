@@ -83,3 +83,97 @@ it('never executes $applyAsynced function in the same cycle', function(done){
 If this were $evalAsync, the async would have happened before the $digest finished. However, as we just said, with $applyAsync, we want to defer the invocation until after the digest cycle. Then, when it is done, it will kick off another digest cycle since it calls $apply which calls $digest. So how do we prevent multiple $applyAsyncs from calling many digests? We need some way to know if a queue dump has been scheduled or not. To do this, we will use a property called `$$applyAsyncId`. If an ID is set, we will not scheudle an additional $apply knowing that the current $apply will drain the queue.
 
 Another aspect of $applyAsync that we should consider is to not do the digest if one happens to be launched for some other reason before the timeout triggers. In that case, the digest should should the queue and the applyAsync timeout should be cancelled.
+
+## Running Code After a Digest - $$postDigest
+
+Although $applyAsync, which we just learned about, invokes its function after the current $digest cycle has concluded, it is not correct to use it for doing post-digest work, and that is through scheduling a $$postDigest function. $$postDigest is an internal Angular construct not meant to be used by developers directly and does not cause a digest to be scheduled. It just performs work after the digest has been completed.
+
+## Watching Several Changes With One Listener: $watchGroup
+
+So far we have been looking at watchers as simple cause-and-effect pairs, but it is not unusual to want to watch several pieces of state and execute some code when any of them change.
+
+To do this, recall that each digest iterates over all of the watchers and executes the listener function when the return value of the watcher has changed from the previous iteration. With that in mind, to craft $watchGroup, we can just unpack an array of watch functions to all invoke the same listener function. Then, instead of passing in the new value and the old value into the listen function, it will pass in all of the values as an array. Here is our first pass at an implementation:
+
+```js
+this.$watchGroup = function(watcherFnList, listenerFn) {
+  var newValues = new Array(watcherFnList.length);
+  var oldValues = new Array(watcherFnList.length);
+  _.forEach(watcherFnList, function(watcherFn, i){
+    this.$watch(watcherFn, function(newValue, oldValue){
+      newValues[i] = newValue;
+      oldValues[i] = oldValue;
+      listenerFn(newValues, oldValues, this);
+    });
+  }.bind(this));
+};
+```
+
+This gets us close to what we are trying to do, however, it is calling the listenerFn for every single watcher in the list of them that we passed in. We ideally only want it to run once if there is any change. The way we can implement this is through scheduling an $evalAsync in the watch group listener, but only if one has not been scheduled yet. Here is our new implementation:
+
+```js
+this.$watchGroup = function(watcherFnList, listenerFn) {
+  var self = this;
+  var newValues = new Array(watcherFnList.length);
+  var oldValues = new Array(watcherFnList.length);
+  var changeReactionScheduled = false;
+  var firstRun = true;
+
+  function watchGroupListener() {
+    if (firstRun) {
+      firstRun = false;
+      listenerFn(newValues, newValues, self);
+    } else {
+      listenerFn(newValues, oldValues, self);
+    }
+    changeReactionScheduled = false;
+  }
+
+  _.forEach(watcherFnList, function(watcherFn, i){
+    self.$watch(watcherFn, function(newValue, oldValue){
+      newValues[i] = newValue;
+      oldValues[i] = oldValue;
+
+      if (!changeReactionScheduled) {
+        changeReactionScheduled = true;
+        self.$evalAsync(watchGroupListener);
+      }
+    });
+  });
+};
+```
+
+One small thing to note that is on the first run of the watch group, the old values and the new values array will always be the same. Therefore, in order to make the comparison pass, we have to ensure that we are comparing the same arrays.
+
+Another small case to handle is what happens when an empty array of watch functions is passed in. You would think that this is pointless and that the listener never runs, however, what Angular actually does is ensure that the listener gets called exactly one time, which empty values as the arrays.
+
+And now, after all of that, there is one final thing we have to do - and that is be able to deregister a watch group the same way we were able to deregister a single watch before. Since each individual watch returns a function to destroy that watch, we can store up those destroy functions as we register them. Then, the return value of the $watchGroup function returns a function that invokes each individual destroy function.
+
+```js
+var destroyFunctions = _.map(watcherFnList, function(watcherFn, i){
+  return self.$watch(watcherFn, function(newValue, oldValue){
+    newValues[i] = newValue;
+    oldValues[i] = oldValue;
+
+    if (!changeReactionScheduled) {
+      changeReactionScheduled = true;
+      self.$evalAsync(watchGroupListener);
+    }
+  });
+});
+
+return function() {
+  _.forEach(destroyFunctions, function(fn){
+    fn();
+  });
+};
+```
+
+For the special case of an empty array of watch functions, the deregistration function should prevent that listener from ever being called.
+
+# Summary
+
+This chapter was all about fleshing out the functions attached to the scope and how they impact the digest cycle.
+
+ - $eval and $apply both execute a function within the context of the scope, however, $apply kicks off a new digest and $eval does not
+ - $evalAsync and $applyAsync both schedule work to be done at a later point in time, however, $evalAsync guarantees that the work will be done during the same digest cycle while $applyAsync won't run until after it has completed.
+ - $watchGroup allows you to watch multiple values at once with the same listener function, although it will only be called once per digest cycle for each change in the watch group.
