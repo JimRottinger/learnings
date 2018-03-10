@@ -60,3 +60,7 @@ it('should not shadow members of the parent scopes attributes', function (){
 ```
 
 This pattern is sometimes called the dot rule, which refers to the amount of property access dots you have in an expression that makes changes to the scope. If you don't have a dot, then you're doing it wrong.
+
+## Separated Watches
+
+We have already seen that we can watch for a change on the parent scope from the child scope, however, where are those watchers actually stored? Because of the prootype chain, they are actually stored on the parent's $$watchers attribute because that does not exist on the child so it bubbles up into the parent's zone. This has the consequence of all watches being executed in the root scope, regardless of which scope calls $digest. What we really want is for the scope that called $digest to be used as the context of the $digest. Therefore, we need to assign each child its own watchers array. In other words, we need to shadow the $$watchers property on purpose.
