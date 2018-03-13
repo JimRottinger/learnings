@@ -64,3 +64,59 @@ This pattern is sometimes called the dot rule, which refers to the amount of pro
 ## Separated Watches
 
 We have already seen that we can watch for a change on the parent scope from the child scope, however, where are those watchers actually stored? Because of the prootype chain, they are actually stored on the parent's $$watchers attribute because that does not exist on the child so it bubbles up into the parent's zone. This has the consequence of all watches being executed in the root scope, regardless of which scope calls $digest. What we really want is for the scope that called $digest to be used as the context of the $digest. Therefore, we need to assign each child its own watchers array. In other words, we need to shadow the $$watchers property on purpose.
+
+## Recursive Digestion
+
+We just saw that $digest should not run watches up the hierarchy and instead, each child should have its own array of watchers. While we don't want watchers running up the chain, we do want them to check for changes down the chain in its children. In order to do this, we need to keep track of the children that each scope has and recursively digest through all of them to check for changes in scope.
+
+Angular's implementation involves of this process involves a linked-list implementation of the scope hierarchy and it iterates over each node recursively until the linked list ends at the lowest-level child. Instead of a $$children array like we are implementing, they have $$nextSibling, $$prevSibling, $$childHead, and $$childTail. This is a performance optimization that we will not be worrying about in our writing. Instead, we will right a helper function to iterate recursively through the $$children array. Functionally, this does the same exact thing.
+
+Our function is going to be called $$everyScope. It is based on JavaScript's array every function which returns true if all values in the array pass some provided conditional test.
+
+```js
+this.$$everyScope = function(fn) {
+  if (fn(this)) {
+    return this.$$children.every(function(child) {
+      return child.$$everyScope(fn);
+    });
+  } else {
+    return false;
+  }
+};
+```
+
+Our conditional test is a simple if-else. If our provided function returns true in the context it is executed in, we recursively call it on its children. The function we are going to be providing is a dirty check. If any of the watchers on the children are dirty, we will keep running the digest loop. Here is our new $$digestOnce function.
+
+```js
+this.$$digestOnce = function() {
+  var dirty;
+  var continueLoop = true;
+  this.$$everyScope(function(scope) {
+    var newValue, oldValue;
+    _.forEachRight(scope.$$watchers, function(watcher){
+      if (watcher) {
+        try {
+          newValue = watcher.watcherFn(scope);
+          oldValue = watcher.last;
+          if (!scope.$$areEqual(newValue, oldValue, watcher.compareByValue)) {
+            dirty = true;
+            scope.$$lastDirtyWatcher = watcher;
+            watcher.last = watcher.compareByValue ? _.cloneDeep(newValue) : newValue;
+            watcher.listenerFn(newValue, oldValue, scope);
+          } else if (scope.$$lastDirtyWatcher === watcher) {
+            continueLoop = false;
+            return false; //return false in a lodash loop causes it to break
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }.bind(this));
+    return continueLoop;
+  });
+
+  return dirty;
+};
+```
+
+There is quite a bit to unpack here. Recall that before our scopes had children, $$digestOnce would iterate through all of its watchers and return true if any of them were dirty which signaled the calling $digest function to iterate again until none of the watchers were dirty. Now, we want that same behavior of $$digestOnce returning true if any of the watchers are dirty, however, now we are checking it recursively. It looks like a lot has changed, however, we are simply calling $$digestOnce on each array of children recursively, each of which will eventually return false when it is no longer dirty. The `every` test ensures that the entire digestOnce will be true if any of the children have a dirty watcher.
