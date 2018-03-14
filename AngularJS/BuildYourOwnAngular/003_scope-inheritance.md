@@ -120,3 +120,19 @@ this.$$digestOnce = function() {
 ```
 
 There is quite a bit to unpack here. Recall that before our scopes had children, $$digestOnce would iterate through all of its watchers and return true if any of them were dirty which signaled the calling $digest function to iterate again until none of the watchers were dirty. Now, we want that same behavior of $$digestOnce returning true if any of the watchers are dirty, however, now we are checking it recursively. It looks like a lot has changed, however, we are simply calling $$digestOnce on each array of children recursively, each of which will eventually return false when it is no longer dirty. The `every` test ensures that the entire digestOnce will be true if any of the children have a dirty watcher.
+
+## Digesting the Whole Tree from $apply, $evalAsync, and $applyAsync
+
+As we just saw, $digest only works from the current scope down and that is intentional. This is not the case with $apply, which goes directly to the root and digests the entire scope hierarchy. Therefore, it is not enough to call $digest on the same scope that $apply was called on because it may have been called on a child.
+
+To solve this is actually pretty simple. Because the hierarchy chain is based on prototypal inheritance, all we have to do is define a property on the root scope and never shadow it and then all of the children will automatically have access to that property.
+
+```js
+this.$root = this;
+```
+
+Before, $apply was just a function that ran a function and then called $digest. But now we have just learned an important difference. $digest only runs from the current scope down and apply runs digest from the root scope.
+
+We also learned previously that $evalAsync also kicked off a $digest. So what scope do we run this on? As it happens, it works exactly like $apply does in that it digests from the root scope.
+
+
