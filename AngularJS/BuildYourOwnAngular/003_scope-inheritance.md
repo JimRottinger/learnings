@@ -135,4 +135,58 @@ Before, $apply was just a function that ran a function and then called $digest. 
 
 We also learned previously that $evalAsync also kicked off a $digest. So what scope do we run this on? As it happens, it works exactly like $apply does in that it digests from the root scope.
 
+## Isolated Scopes
 
+We have just learned that the relationship between parent and child scopes in Angular is fairly closely knit. Digests will run down the chain of all of its children and some functions, such as $apply and $evalAsync will always run the digest from the root scope. Beyond the digests, whatever properties the parent has, the child can access directly.
+
+But what if we don't want this level of intimacy? There are definitely going to be times when it will be convenient to have a scope that is part of the hierarchy but not give it access to everything its parents contain. This is what isolated scopes are for. We want a scope that inherits from a parent but then is cut off from the prototype chain. We want to be able to do this by passing a boolean value into the $new function.
+
+```js
+this.$new = function(isolated) {
+  var ChildScope = function() {
+    this.$$watchers = [];
+    this.$$children = [];
+  };
+  ChildScope.prototype = this;
+
+  var child;
+  if (isolated) {
+    child = new Scope();
+  } else {
+    child = new ChildScope();
+  }
+
+  this.$$children.push(child);
+  return child;
+};
+```
+
+This shows that isolated scopes are brand new scopes that do not have a prototype chain back up to the parent. With this change, we have to revisit our discussion on $apply and $evalAsync and digesting from the root. Should a parent digest its isolated children? Also, should $apply and $evalAsync still digest from the root when called from an isolated scope? The answer is that, yes, we do. In addition, we want them to share the same async queue, post digest queue, and apply async queue. We do this by sharing the root with the isolated child scope.
+
+## Substituting a Different Parent
+
+Angular enables you to pass a parent into the $new function. This is an interesting feature because the original purpose of the $new function was to be able to create a child on an existing scope. So if the $new function is already adding the new child scope to its list of children, then why would we ever need to pass in a parent? It is possible because it makes it possible to set up a biforcated parent chain in which one parent scope is used for prototypal inheritance and another is used for hierarchical digestions. The one that we will be passing in will be the hierarchical parent. Here is our test case:
+
+```js
+it('can take in some other scope as the parent', function() {
+  var prototypeParent = new Scope();
+  var hierarchyParent = new Scope();
+  var child = prototypeParent.$new(false, hierarchyParent);
+
+  prototypeParent.value = 1;
+  expect(child.value).toBe(1);
+
+  child.counter = 0;
+  child.$watch(function(scope) {
+    scope.counter++;
+  });
+
+  prototypeParent.$digest();
+  expect(child.counter).toBe(0);
+
+  hierarchyParent.$digest();
+  expect(child.counter).toBe(2);
+});
+```
+
+In this test, we call $new on the prototype parent and then test that the child has the same property as the parent. However, for the digest, the prototype parent digest does not activate the child watcher. That is because we set up our hierarchy parent to be a different scope. This is a neat way to create a scope with a specific set of attributes and assign it to be in the digest chain of some other existing hierarchy. This can get messy, so let's keep a reference on each child to its hierarchy parent so that we are able to clean up scopes when we need to destroy them.
