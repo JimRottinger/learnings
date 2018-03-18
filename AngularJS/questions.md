@@ -2,15 +2,17 @@
 
 From the author of Build Your Own Angular:
 
->>> 	AngularJS is not a small framework. It has a large surface area with many new concepts to grasp.
+> AngularJS is not a small framework. It has a large surface area with many new concepts to grasp.
 Its codebase is also substantial, with 35K lines of JavaScript in it. While all of those new concepts
 and all of those lines of code give you powerful tools to build the apps you need, they also come
 with a steep learning curve.
-	I hate working with technologies I don’t quite understand. Too often, it leads to code that just happens
+
+> I hate working with technologies I don’t quite understand. Too often, it leads to code that just happens
 to work, not because you truly understand what it does, but because you went through a lot
 of trial and error to make it work. Code like that is difficult to change and debug. You can’t reason
 your way through problems. You just poke at the code until it all seems to align.
-	Frameworks like AngularJS, powerful as they are, are prone to this kind of code. Do you understand
+
+> Frameworks like AngularJS, powerful as they are, are prone to this kind of code. Do you understand
 how Angular does dependency injection? Do you know the mechanics of scope inheritance?
 What exactly happens during directive transclusion? When you don’t know how these things work,
 as I didn’t when I started working with Angular, you just have to go by what the documentation
