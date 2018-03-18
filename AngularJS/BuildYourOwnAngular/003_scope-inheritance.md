@@ -190,3 +190,13 @@ it('can take in some other scope as the parent', function() {
 ```
 
 In this test, we call $new on the prototype parent and then test that the child has the same property as the parent. However, for the digest, the prototype parent digest does not activate the child watcher. That is because we set up our hierarchy parent to be a different scope. This is a neat way to create a scope with a specific set of attributes and assign it to be in the digest chain of some other existing hierarchy. This can get messy, so let's keep a reference on each child to its hierarchy parent so that we are able to clean up scopes when we need to destroy them.
+
+## Summary
+
+Prior to this chapter, Scopes will simple javascript objects that were only responsible for themselves. However, large applications require a hierarchy of scopes, and we just saw how child-parent relationships are built into scopes. Specifically, we learned:
+
+ - How child scopes are created using $new
+ - How scope inheritance is based on the JavaScript's prototypal inheritance
+ - Recursive digestion, and how it should go down the chain but not up the chain
+ - $apply and $evalAsyc call digest from the root of the scope chain, regardless of which scope calls it
+ - Isolated scopes, and how they can have a prototypal parent and a hierarchical parent
