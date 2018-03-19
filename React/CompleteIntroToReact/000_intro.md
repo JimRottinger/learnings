@@ -53,4 +53,4 @@ const myTitle = function (props) {
 }
 ```
 
-With that in mind, in seems a bit wordy to have to write createElement over and over and over again. With component-based composition, we just want to create elements with the name of the component and to have it just work.
+With that in mind, in seems a bit wordy to have to write createElement over and over and over again. With component-based composition, we just want to create elements with the name of the component and to have it just work. This is where JSX comes in which we will see in the next section
