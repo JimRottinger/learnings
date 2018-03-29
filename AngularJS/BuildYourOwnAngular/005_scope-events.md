@@ -53,4 +53,37 @@ Our mechanism for deregistering an event listener is the same as deregistering a
 
 Up until this point, only events emitted and broadcast from the current scope will be received by events on that same scope. But we just talked about wanting to be able to emit/broadcast events up or down the scope hierarchy. This is the part that is different between $emit and $broadcast. $emit goes up the chain and $broadcast go down the chain. So in this part, we are going to be implemented the $emit function.
 
-Recall that we previously located listeners by checking to see if the current scope's listeners object contained a key with the event name. That is no longer enough. Now, we need to be able to check multiple parents event scopes for listeners.
+Recall that we previously located listeners by checking to see if the current scope's listeners object contained a key with the event name. That is no longer enough. Now, we need to be able to check multiple parents event scopes for listeners. This is done by iterating up the parent chain and emitting the event until there are no more parents.
+
+```js
+this.$emit = function(eventName) {
+  var eventObject = {name: eventName};
+  var listenerArgs = [eventObject].concat(_.tail(arguments));
+  var scope = this;
+  do {
+    scope.$$fireEventOnScope(eventName, listenerArgs);
+    scope = scope.$parent;
+  } while (scope);
+  return eventObject;
+};
+```
+
+## Broadcasting Down the Scope Hierarchy
+
+Broadcast is the mirrior image of $emit, excep that it invokes the listener in the children instead of a parent. This gets a little bit more tricky because while a scope can have only one parent, it can have many child, and those children could have many child. We have to ensure that we broadcast to all of them, included isolated childeren.
+
+This might sound familiar. That is because we already implemented a child tree traversal function for $$digestOnce. The digest has to check if any of the children properties are dirty, so we can reuse the $$everyScope function that it uses.
+
+```js
+this.$broadcast = function(eventName) {
+  var eventObject = {name: eventName};
+  var listenerArgs = [eventObject].concat(_.tail(arguments));
+  this.$$everyScope(function(scope){
+    scope.$$fireEventOnScope(eventName, listenerArgs);
+    return true;
+  });
+  return eventObject;
+};
+```
+
+Based on this code and the description, it should be obvious that emitting an event is much more performant than broadcasting one.
