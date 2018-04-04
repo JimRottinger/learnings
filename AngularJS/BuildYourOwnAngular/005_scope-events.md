@@ -87,3 +87,13 @@ this.$broadcast = function(eventName) {
 ```
 
 Based on this code and the description, it should be obvious that emitting an event is much more performant than broadcasting one.
+
+## Additional Information on the Event Object
+
+At the moment, our event object only contains one attribute - the event name. That can only do so much for us. Now, we are going to bundle some more information in it, especially now that we are broadcasting and emitting events up and down the scope hierarchy. The first thing we can add is a link to the target scope (the scope that the event came from) and the current scope (the scope of the listener function we are executing in). We will call these `currentScope` and `targetScope`.
+
+## Stopping Event Propogation and Preventing Default Behavior
+
+Much like the way we often want to stop the propagation on javascript DOM events, it would be nice if we had a way to stop the propogation of scope events in Angular. Broadcasted events cannot be stopped, however, we want to have a `stopPropagation` function for emitted events to prevent them from bubbling up if its already been handled. We want to ensure that even if an event is stopped, it still gets handled by all listeners on the current scope.
+
+Another DOM behavior that we want to mimic is prevent the default behavior on events such as pereventing links from changing the url. It does this through `preventDefault`. But what default behavior do we want to prevent on scope events? Browsers have default behaviors, our scope does not. As it turns out, our preventDefault function will not affect the scope event system behavior. It simply meant to be a carrier of boolean information to be used later on. An example of when it can be used is by a custom directive to determine if it should trigger some default browser behavior.
