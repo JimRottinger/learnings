@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Learnings](README.md)
-* typescript
+* TypeScript
   * [TypeScript Interview-Style Questions](typescript/questions.md)
   * [TypeScript](typescript/notes.md)
   * [TypeScript Exercises](typescript/exercises.md)
