@@ -19,7 +19,7 @@
     * [Chapter 3 - Scope Inheritance](angularjs/buildyourownangular/003_scope-inheritance.md)
     * [Chapter 1 - Scopes and Dirty Checking](angularjs/buildyourownangular/001_scope-and-dirty-checking.md)
   * [Angular Interview-Style Questions](angularjs/questions.md)
-* react
+* React
   * completeintrotoreact
     * [JSX](react/completeintrotoreact/001_jsx.md)
     * [Complete Intro to React V3 by Brian Holt, Frontend Masters](react/completeintrotoreact/000_intro.md)
