@@ -1,6 +1,6 @@
-# 002\_scope-methods
+# Chapter 2 - Scope Methods
 
-## Chapter 2 - Scope Methods
+
 
 In Chapter 1, we implemented basic dirty-checking, $watch, and $digest. Now, we are going to turn our attention to expanding the methods on the scope. We'll add several ways one can access scopes and evaluate scope to cause dirty checking to be triggered.
 
