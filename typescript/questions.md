@@ -9,8 +9,9 @@ I like including this section in addition to the exercises because I believe you
 3. Explain the difference between a nominal type-checking system and a structural type-checking system.
 4. Explain the difference between implicit and explicit type declaration in TypeScript.
 5. What are some of the ways to perform explicit type declaration in TypeScript?
-6. Give an example (or a few) of when and how interfaces can be used in TypeScript
+6. Give an example \(or a few\) of when and how interfaces can be used in TypeScript
 
 ## Answers
 
 todo
+

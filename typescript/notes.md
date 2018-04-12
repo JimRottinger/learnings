@@ -8,7 +8,7 @@ TypeScript is typed superset of JavaScript originally developed by Microsoft. It
 
 TypeScript also implements modern language features so it is very important to draw the distinction between what is TS and what is ES-next.
 
-#### Motivation for TypeScript
+### Motivation for TypeScript
 
 In terms of value types, JavaScript is pretty limited. It has six primitive types such as string, number, null, etc. and then everything else extends from Object. And even though the language has some types, it is a mutable type and you cannot specify a type upon variable instantiation. This makes it harder to reason about our code because we or anyone else can change the type of a variable at any time, potentially breaking code down later on in the pipeline. It also makes code more self-documenting because when we read code for the first time, we know what type a variable or parameter is supposed to be.
 
@@ -17,20 +17,22 @@ Put fancily in a one-liner, the power of types is that it makes code more expres
 ## Attribution
 
 All of the material contained in this document has been derived from the following sources:
- - [The official TypeScript website](https://www.typescriptlang.org/index.html)
- - The [Front-end Masters](www.frontendmasters.com) workshop on TypeScript, presented by [Mike North](https://github.com/mike-north). Many of the exercises in these notes are pulled directly from this source. I would highly recommend checking it out as Mike explains concepts at a much deeper level than I take notes on here.
+
+* [The official TypeScript website](https://www.typescriptlang.org/index.html)
+* The [Front-end Masters](https://github.com/JimRottinger/learnings/tree/a0638c9e3ec90727947df413490efbdb5b942d53/TypeScript/www.frontendmasters.com) workshop on TypeScript, presented by [Mike North](https://github.com/mike-north). Many of the exercises in these notes are pulled directly from this source. I would highly recommend checking it out as Mike explains concepts at a much deeper level than I take notes on here.
 
 ## How it Works
 
 TypeScript has **implicit typing** - it can make good guesses at types through the assignment.
 
-```js
+```javascript
 let teacherAge = 34;
 teacherAge = '35'; //type string is not assignable to a number
 ```
 
 It also has **explicit type assignment**.
-```js
+
+```javascript
 let teacherAge: number = 34; //type annotation form of explicit casting
 let input = document.querySelector('input#name_field') as HTMLInputElement //'as' keyword
 let input2 = <HTMLInputElement>document.querySelector('input#name_field') //casting
@@ -38,13 +40,13 @@ let input2 = <HTMLInputElement>document.querySelector('input#name_field') //cast
 
 The **type annotation form can be used for function parameters and function return values.**
 
-```js
+```javascript
 function login(username: string, password: string) : User {
   //do something and return a User object
 }
 ```
 
-*At this point you should should be able to complete exercise 1 in the exercises file.*
+_At this point you should should be able to complete exercise 1 in the exercises file._
 
 ## Object Shape
 
@@ -55,11 +57,11 @@ So under the hood, how does it check that the type is correct? Compiler-wise, th
 
 The second option is how TypeScript works, but what do we mean by shape? The shape of an object is the names of the properties along with the types of the properties. With that in mind, we can create an object with the same shape as another and it will pass the type checks. This is a good thing! - because we can extend some minimal set of properties and an instance of the extended object will still pass the type check. Put more clearly, in terms of typing, an object can have a superset of the required properties, but not a subset, in order for the typing to pass.
 
-#### The Object Literal Difference
+### The Object Literal Difference
 
 I just stated that in terms of type checking, we only care about the minimal set of properties and any excess properties are okay. This is actually only true for function parameters. When it comes to defining object literals, things are a bit more strict. Here is an example.
 
-```js
+```javascript
 let myCar: { make: string, model: string, year: number};
 
 myCar = {
@@ -70,13 +72,13 @@ myCar = {
 }; //not assignable error
 ```
 
-One way to solve this is to make color an optional type (which we haven't learned how to do yet), the other way is through an interface.
+One way to solve this is to make color an optional type \(which we haven't learned how to do yet\), the other way is through an interface.
 
 ## Interfaces
 
 An interface describes the structure of an object and have no implementation. To frame it in terms of other programming languages, it would be a pure abstract class.
 
-```js
+```javascript
 interface Car {
   make: string,
   model: string,
@@ -86,7 +88,7 @@ interface Car {
 
 For an example of when interfaces would be very useful, let's talk about a front-end application in which we have two types of users, regular users and admins. Users and admins are very similar, except that admins have a few special properties that users do not have. In this case, an Admin interface can extend the User interface and add a few additional properties. Then, for all functions that take in a User as a parameter, we could pass in an Admin instead because Admins are supersets of Users. Similarly, a function that takes in an admin would reject a normal user because a user does not fit the full shape of a Admin.
 
-```js
+```javascript
 interface User {
   email: string;
   password: string;
@@ -98,24 +100,24 @@ interface Admin extends User {
 }
 ```
 
-#### Type Aliases
+### Type Aliases
 
 Sometimes, creating an entire iterface isn't necessary to define a structure. In these cases, the `type` keyword can be used to define a type alias.
 
-```js
+```javascript
 type RGBColor = [number, number, number];
 let red: RGBColor = [255, 0, 0];
 ```
 
 Types can be exported, just like interfaces, so they can be included wherever they are needed.
 
-*At this point you should be able to complete exercise 2.*
+_At this point you should be able to complete exercise 2._
 
 ## Classes & Property Types
 
-As soon as we start mentioning interfaces and extends (inheritance), we have to include a discussion on Classes. ES6 introduced the Class syntax in JavaScript, so how does TypeScript tie into that? Let's start off with an example of a class.
+As soon as we start mentioning interfaces and extends \(inheritance\), we have to include a discussion on Classes. ES6 introduced the Class syntax in JavaScript, so how does TypeScript tie into that? Let's start off with an example of a class.
 
-```js
+```javascript
 class Car {
   constructor(make, model) {
     this.make = make;
@@ -151,7 +153,7 @@ console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
 
 In this example, we see the class Truck extending a base-class Car. In this Truck's function, we use the keyword `super` to call up to the Car's functions. We can also see that Class's constructor defines its shape as well. We can use TypeScript to mark this up with types.
 
-```js
+```javascript
 class Car {
   make: string
   model: string
@@ -187,13 +189,14 @@ let myTruck = new Truck('Ford', 'F150', 6);
 
 console.log(myTruck.toJSON()); //{make: "Ford", model: "F150", numWheels: 6}
 ```
+
 Be sure to add type annotations to both the properties and the construction arguments.
 
-#### Enums
+### Enums
 
 It is pretty common to want to constrain the possible values of a property to a specific set of values. For this case, TypeScript defines the `enum` keyword. `enum` is used to define a type consisting of ordered members.
 
-```js
+```javascript
 enum ShippingStatus {
   Pending,
   BeingPrepared,
@@ -210,17 +213,17 @@ class Order {
 }
 ```
 
-#### Arrays
+### Arrays
 
 In vanilla JavaScript, it is possible to have an array with a mixed bag of types such as `[1,2,'not a number']`. With TypeScript, it is possible to constrain an array to a single type.
 
-```js
+```javascript
 let nums: number[] = [1,2,3];
 ```
 
 There is a special type of an array called a **tuple**. A tuple is an array of fixed length, usually in a specific order with a specific type for each value. In that sense, they are a lot like objects, but they can shine when used in combination with destructuring. Here is an example of an array of array of dependencies where each value is an array with a package name and a version number.
 
-```
+```text
 let dependencies: [string, number][] = [];
 ```
 
@@ -228,13 +231,13 @@ let dependencies: [string, number][] = [];
 
 Up to this point, we have been talking about TypeScript in terms of defining object or class structure, but what about functions? Well, functions have a type just like any other value. It's function signature defines its expected arguments, the types of those arguments, and the return value of the function. Here is how you define a function type:
 
-```js
+```javascript
 let login: (username: string, password: string) => User;
 ```
 
 Just as we saw above, in addition to types, we can also define the interface of a function.
 
-```js
+```javascript
 interface ClickListener {
   (this: Window, e: MouseEvent): void
 }
@@ -246,11 +249,11 @@ const myListener: ClickListener = function(e) {
 
 One super interesting thing to note about the above code example is that we can actually check the type of `this` for a function. For the `ClickListener` interface, we expect `this` to be a Window object. This prevents us from calling `myListener` directly. It has to be called in context of a Window.
 
-#### Function Arguments
+### Function Arguments
 
 Unless you say otherwise, TypeScript assumes every argument in the function is required. Here is an example of how to make an optional argument in TypeScript:
 
-```js
+```javascript
 function createUser(name: String, email: String, profileUrl ?: URL)
 ```
 
@@ -260,7 +263,7 @@ What this implies is that the type of profileUrl is `URL | null`. Then, if you t
 
 Generics are a TypeScript-only construct because they have everything to do with types. Generics allow us to reuse code across many types, interfaces, and functions. Consider the following code example:
 
-```js
+```javascript
 function gimmieFive<T>(x: T): T[] {
   return [x,x,x,x,x];
 }
@@ -270,7 +273,7 @@ let eggs: string[] = gimmieFive('egg');
 
 In this example, `T` is a generic whose type is determined inplicitly by the argument that is passed into the `gimmieFive` function. If you pass in 3, T will be number and if you pass in 'egg', T will be string. It should be noted there is nothing special about the T. T could be anything.
 
-```js
+```javascript
 function gimmieFive<SomeGenericName>(x: SomeGenericName): SomeGenericName[] {
   return [x,x,x,x,x];
 }
@@ -281,11 +284,11 @@ console.log(threes);
 console.log(eggs);
 ```
 
-#### Constraints on Generics
+### Constraints on Generics
 
 Often we will want to put some kind of constraint on a generic in that in can accept some things but not all things.
 
-```js
+```javascript
 function midpoint<T extends Point2D>(p1: T, p2: T): T {
   return new Point2D(p1.x - p2.x, p1.y, p2.y);
 }
@@ -293,11 +296,11 @@ function midpoint<T extends Point2D>(p1: T, p2: T): T {
 
 In this example, T can still be anything so long as it conforms to the object shape of `Point2D`.
 
-#### Generic Classes
+### Generic Classes
 
-Generic classes have a generic type parameter list in angle brackets (<>) following the name of the class.
+Generic classes have a generic type parameter list in angle brackets \(&lt;&gt;\) following the name of the class.
 
-```js
+```javascript
 class GenericNumber<T> {
     zeroValue: T;
     add: (x: T, y: T) => T;
@@ -308,4 +311,5 @@ myGenericNumber.zeroValue = 0;
 myGenericNumber.add = function(x, y) { return x + y; };
 ```
 
-When you instantiate a generic class, you are supplying the type for the for that instance of the class to use. In this sense, the type(s) basically act like an argument to the constructor of your class.
+When you instantiate a generic class, you are supplying the type for the for that instance of the class to use. In this sense, the type\(s\) basically act like an argument to the constructor of your class.
+

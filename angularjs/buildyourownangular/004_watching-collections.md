@@ -8,7 +8,7 @@ Of course, this is already possible with a watch expression when comparing by va
 
 The function signature of $watchCollection is going to be nearly identical to that of the $watch function. Within, it will actually delegate to the $watch function, but we will supply our own, locally created versions of the watch and listener function.
 
-```js
+```javascript
 this.$watchCollection = function(watchFn, listenFn) {
   var internalWatchFn = function(scope) {
   };
@@ -26,7 +26,7 @@ Even though $watchCollection is designed for watching arays and objects, it shou
 
 I am not going to spend a lot of time taking too many notes on this section because it isn't super difficult to understand conceptually. Here is our final function:
 
-```js
+```javascript
 this.$watchCollection = function(watchFn, listenerFn) {
   var newValue, oldValue, oldLength, veryOldValue;
   var trackVeryOldValue = (listenerFn.length > 1);
@@ -115,3 +115,4 @@ this.$watchCollection = function(watchFn, listenerFn) {
 Looks like a huge function, but it is really just setting up a $watch expression. Remember that a watch function should return a value to be watched. It doesn't particlarly matter what it is returned, so long as it is different than the previous time it was executed, then the listener function will run. In this case, we keep a simple counter that we increment every time a change is detected.
 
 There are three different cases for detecting a change - the array case, the object case, and the primitive case. For the array, it compares the size and each individual value in order. Objects also check the length, but they doesn't care about order. Therefore, it compares each property value to the same value at the past iteration, and checks to see if that property was there before. The primitive case simply checks the equality of the new value and the old value. If any of the these detect a change, the listener function will run. The listener function we have created is exactly like the one we created for watchGroup. If it is the first run, it will use the same parameter for the newValue and oldValue.
+

@@ -2,16 +2,16 @@
 
 Scope is one of Angular's central building blocks and is used for many purposes:
 
- - Sharing data between a controller/directive and its view template
- - Sharing data between different parts of the UI
- - Broadcasting and listening for events
- - Watching for changes in data
+* Sharing data between a controller/directive and its view template
+* Sharing data between different parts of the UI
+* Broadcasting and listening for events
+* Watching for changes in data
 
 Of these, the watching for changes in value is the most interesting and the one that almost all JavaScript frameworks solve in some way. Angular scopes implement dirty-checking and you can get notified when a piece of data on the scope changes. It is the secret-sauce of data binding and that is what we will be focusing on in the first part of this tutorial
 
 ## Scope Objects
 
-In Angular, scopes can be created by applying the `new` operator to the `Scope` constructor. The result is a plain old JavaScript object (POJO). Because it is simply a POJO, we attach properties to it by calling `.property = `. There are no special setters or getters that you need to call, nor restrictions on what values you setting.
+In Angular, scopes can be created by applying the `new` operator to the `Scope` constructor. The result is a plain old JavaScript object \(POJO\). Because it is simply a POJO, we attach properties to it by calling `.property =`. There are no special setters or getters that you need to call, nor restrictions on what values you setting.
 
 ## Watching Object Properties: $watch and $digest
 
@@ -25,7 +25,7 @@ Watchers get registered to the scope under the `$$watchers` property. The double
 
 Here is our minimal implementation of angular scope, watch, and digest so far:
 
-```js
+```javascript
 function Scope() {
   this.$$watchers = [];
   this.$watch = function(watcherFn, listenerFn) {
@@ -55,13 +55,13 @@ Knowing this, we can gather a couple points about the performance of Angular. Fi
 
 When we initially wrote the digest function, it compared the new value of the scope property to last value of that same property when the digest cycle ran. This works well enough, but it does not work for the first digest cycle because our first `last` value will be `undefined` and the first new value might very well be `undefined` because that is a valid value. In this case, however, our comparison will fail and the listener function will not execute. We need a better initial value.
 
-Instead of setting the initial watch value to `undefined`, we can set it to an empty function since functions are so-called *reference values* meaning that they are not equal to anything except themself.
+Instead of setting the initial watch value to `undefined`, we can set it to an empty function since functions are so-called _reference values_ meaning that they are not equal to anything except themself.
 
 ### Keeping The Digest Going While It Stays Dirty
 
 The basics of our implementation is in place, however, the case we haven't covered yet is one in which the listener function changes the value of the property on the scope. This is a common case to want to transform a user input after they have entered it, or change one property based on another. However, if another watcher is looking at the same value as one that just changed changed, it might not notice the change during the same digest pass. That being said, we have to ensure we trigger chained watchers in the same digest. Consider the following test code:
 
-```js
+```javascript
 it('triggers chained watchers in the same digest', function() {
   scope.name = "Jim";
 
@@ -96,7 +96,7 @@ The test is designed to deliberately order the watchers in such a way that the f
 
 To implement this, we need each digest to return whether or not it found a dirty value, and to run it until it stops being dirty.
 
-```js
+```javascript
 this.$digest = function() {
   var dirty;
   do {
@@ -113,7 +113,7 @@ Based on what we have just learned, it is easy to observe that our watchers may 
 
 The situation just described in which the digest runs infinitely is called an unstable digest. In this situation, what we want to do is run the digest for a number of iterations and then eventually throw an exception. The maximum number of iterations is called the Time to Live, or TTL. By default, it is 10. It is possible to adjust it but, at that point, the software design can proabably be better.
 
-```js
+```javascript
 this.$digest = function() {
   var dirty, iterations;
   iterations = 0;
@@ -129,7 +129,7 @@ this.$digest = function() {
 
 As it stands now, we are iterating over every single watcher and if even one of them is dirty, all of them will run again. One optimization that we can make is to shirt-circuit the remainder of the watches when the last watch becomes clean. To do so, we can simply keep track of the last watcher that was dirty and, then, for each subsequent clean pass, if it matched the previously dirty one, we know that one full cycle has passed and we can exit early. Here is our test case for these to show what we mean:
 
-```js
+```javascript
 it('ends the digest when the last watch is clean', function() {
   scope.array = _.range(100);
   var watchExecutions = 0;
@@ -170,7 +170,7 @@ Now we are going to talk about how values actually get compared to detech that s
 
 Angular ships with its own equal checking function, but we’re going to use the one provided by Lo-Dash instead because it does everything we need. We also need to change the way we are storing the old value because it is not enough to simply store a reference to the current value because then any changes to that value will not be noticed. Instead, we have to make a deep copy of it. Lodash can help us here as well with the `cloneDeep` function.
 
-```js
+```javascript
 this.$$digestOnce = function() {
   var newValue, oldValue, dirty;
   _.each(this.$$watchers, function(watcher){
@@ -201,9 +201,9 @@ There is a third type of dirty checking mechanism in Angular called Collection W
 
 ### NaNs are Weird
 
-In JavaScript, NaN (not a number) is not equal to itself. This comes directly from the IEEE standard for floating point numbers. Therefore, we need to explicitly handle it in our dirty-checking function. If not, a NaN value will will always be dirty.
+In JavaScript, NaN \(not a number\) is not equal to itself. This comes directly from the IEEE standard for floating point numbers. Therefore, we need to explicitly handle it in our dirty-checking function. If not, a NaN value will will always be dirty.
 
-```js
+```javascript
 this.$$areEqual = function(newValue, oldValue, compareByValue) {
   if (compareByValue) return _.isEqual(newValue, oldValue);
   return newValue === oldValue ||
@@ -221,7 +221,7 @@ In the actual Angular implementation, it forwards exceptions to a special `$exce
 
 When you register a watch, usually you want it to stay active as long as the scope itself does. There are cases, however, in which we need to explicitly remove a watcher while keeping the scope operational. That means we need a removal operation. The way Angular implements this is that the `$watch` function has a return value which is a function that, when invoked, destroys the watch that was registered. Therefore, if we want to remove the watcher later on, we have to keep ahold of that returned function and call it once to destroy it.
 
-This sounds straightforward enough, however, it gets tricky when we want to remove watchers during the digest cycle. And its tricky because of how JavaScript implements the each function. That is - when a value is removed from an array, the entire array beyond it is shifted to the left. If you were iterating through a list of three watchers, and the second watcher is meant to only run once and then remove itself, then the third watcher will not run. So how can we solve this shift-left problem? Firstly, instead of pushing new watchers to array, we can `unshift` them to the front. Then, when we iterate over all of them, we can iterate from back-to-front instead of front-to-back (lodash provides a handy `forEachRight` function for this, although its not that hard to write yourself). With these changes made, in our example of three watchers and the second one removing itself, the third watcher will still execute because we are iterating downwards and the ones being shifted have already been executing.
+This sounds straightforward enough, however, it gets tricky when we want to remove watchers during the digest cycle. And its tricky because of how JavaScript implements the each function. That is - when a value is removed from an array, the entire array beyond it is shifted to the left. If you were iterating through a list of three watchers, and the second watcher is meant to only run once and then remove itself, then the third watcher will not run. So how can we solve this shift-left problem? Firstly, instead of pushing new watchers to array, we can `unshift` them to the front. Then, when we iterate over all of them, we can iterate from back-to-front instead of front-to-back \(lodash provides a handy `forEachRight` function for this, although its not that hard to write yourself\). With these changes made, in our example of three watchers and the second one removing itself, the third watcher will still execute because we are iterating downwards and the ones being shifted have already been executing.
 
 There is another gotcha here, there. Our solution works for watchers removing themselves, but what if one watcher removes another? Specifically, what happens if one watcher causes an array shift in the part of the array that has not yet been executed? Even worse; what happens when one watcher removes many other watchers? For the first case, if a watcher were to remove the one next-in-line, it would end up executing twice because the array shifts itself down one into the next iteration position. This breaks our short-circuit optimization because if the watcher is dirty in the first execution and dirty in the second, then the forEach will return early. What we need to do is reset the `$$lastDirtyWatch` when a watcher is removed. Lastly, if a watcher destroys multiple other watchers, we run the risk of shifting the array down to the point at which the watcher at current iteration no longer exists. Therefore, we should explicity check if the watcher is still there before running anything in the digest cycle.
 
@@ -229,9 +229,10 @@ There is another gotcha here, there. Our solution works for watchers removing th
 
 We have just learned all about the implementation of scope, $digest, and $watch in Angular. Some key points not to forget are:
 
- - The scope is just a plain-old JavaScript object void of any special getters or setters.
- - A $watch function consists of a watcher function and a listener function. The watch function returns the value that it is watching and, if it has changed since the last iteration, the listener function will execute.
- - The digest cycle involves iterating through all of the existing watchers and checking if their returned value has changed from the last iteration. If so, it executes the listener function. It does this iteration until none of the watchers come back dirty.
- - The TTL (time-to-live) determines the max number of times that the digest cycle will go through all of the watchers.
- - Angular supports both reference-based dirty-checking and value-based. It is reference-based by default because value-based checking involves iteration through all values to see if anything has changed.
- - Because it is possible to remove watchers during the digest cycle, watchers are iterated from right-to-left to account for left-shifts in the array. In addition, it always checks that the watcher still exists before executing it.
+* The scope is just a plain-old JavaScript object void of any special getters or setters.
+* A $watch function consists of a watcher function and a listener function. The watch function returns the value that it is watching and, if it has changed since the last iteration, the listener function will execute.
+* The digest cycle involves iterating through all of the existing watchers and checking if their returned value has changed from the last iteration. If so, it executes the listener function. It does this iteration until none of the watchers come back dirty.
+* The TTL \(time-to-live\) determines the max number of times that the digest cycle will go through all of the watchers.
+* Angular supports both reference-based dirty-checking and value-based. It is reference-based by default because value-based checking involves iteration through all values to see if anything has changed.
+* Because it is possible to remove watchers during the digest cycle, watchers are iterated from right-to-left to account for left-shifts in the array. In addition, it always checks that the watcher still exists before executing it.
+

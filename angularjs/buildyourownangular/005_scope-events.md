@@ -16,7 +16,7 @@ The first step in setting up a pub-sub interaction is registering a listener. In
 
 Storing the listeners on the scope was fairly easy. Obviously, the second part of the equations is broadcasting and emitting scopes in the correct direction and getting the listener functions ot fire off. For this, we will implement two functions: $emit and $broadcast. The basic functionality of both funcitons is that when you call them with an event name as an argument, they will call all of the listeners that have been registered for that event name. Here is our basic functionality:
 
-```js
+```javascript
 this.$emit = function(event) {
   this.$$fireEventOnScope(event)
 };
@@ -39,7 +39,7 @@ We're currently calling the listeners without any arguments, however, events wou
 
 We also want to be able to attach information that the broadcaster or emitter may have sent along with the event name, like this:
 
-```js
+```javascript
 aScope.$emit('eventName', 'and', 'additional', 'arguments');
 ```
 
@@ -55,7 +55,7 @@ Up until this point, only events emitted and broadcast from the current scope wi
 
 Recall that we previously located listeners by checking to see if the current scope's listeners object contained a key with the event name. That is no longer enough. Now, we need to be able to check multiple parents event scopes for listeners. This is done by iterating up the parent chain and emitting the event until there are no more parents.
 
-```js
+```javascript
 this.$emit = function(eventName) {
   var eventObject = {name: eventName};
   var listenerArgs = [eventObject].concat(_.tail(arguments));
@@ -72,9 +72,9 @@ this.$emit = function(eventName) {
 
 Broadcast is the mirrior image of $emit, excep that it invokes the listener in the children instead of a parent. This gets a little bit more tricky because while a scope can have only one parent, it can have many child, and those children could have many child. We have to ensure that we broadcast to all of them, included isolated childeren.
 
-This might sound familiar. That is because we already implemented a child tree traversal function for $$digestOnce. The digest has to check if any of the children properties are dirty, so we can reuse the $$everyScope function that it uses.
+This might sound familiar. That is because we already implemented a child tree traversal function for everyScope function that it uses.
 
-```js
+```javascript
 this.$broadcast = function(eventName) {
   var eventObject = {name: eventName};
   var listenerArgs = [eventObject].concat(_.tail(arguments));
@@ -90,7 +90,7 @@ Based on this code and the description, it should be obvious that emitting an ev
 
 ## Additional Information on the Event Object
 
-At the moment, our event object only contains one attribute - the event name. That can only do so much for us. Now, we are going to bundle some more information in it, especially now that we are broadcasting and emitting events up and down the scope hierarchy. The first thing we can add is a link to the target scope (the scope that the event came from) and the current scope (the scope of the listener function we are executing in). We will call these `currentScope` and `targetScope`.
+At the moment, our event object only contains one attribute - the event name. That can only do so much for us. Now, we are going to bundle some more information in it, especially now that we are broadcasting and emitting events up and down the scope hierarchy. The first thing we can add is a link to the target scope \(the scope that the event came from\) and the current scope \(the scope of the listener function we are executing in\). We will call these `currentScope` and `targetScope`.
 
 ## Stopping Event Propogation and Preventing Default Behavior
 
@@ -101,13 +101,15 @@ Another DOM behavior that we want to mimic is prevent the default behavior on ev
 ## Summary
 
 We have now implemented the Angular scope system in full. In this chapter specifically, we covered:
- * How Angular implements its scope system using pub/sub
- * How it is tied to the scope hierarchy
- * The difference between broadcasting an event and emitting one
- * What information is contained within the event object
- * How the scope attributes are modelled after the DOM event model
- * When and how the scope events can be stopped.
+
+* How Angular implements its scope system using pub/sub
+* How it is tied to the scope hierarchy
+* The difference between broadcasting an event and emitting one
+* What information is contained within the event object
+* How the scope attributes are modelled after the DOM event model
+* When and how the scope events can be stopped.
 
 In a vacuum, what we have created thus far is an object creation and management system. Remember that the scope started off as a plain-old JavaScript object that we added a lot of functionality to. This functionality includes registering watchers to detect changes in the object properties, running a digest to see if anything has changed, executing the listener functions, and an event system to broadcast or emit an event. We also implemented ways to run functions in the context of a scope, including eval, apply, evalAsync, and applyAsync.
 
 Even though scope is a core part of how Angular works, we are still a far cry from having a full framework. The biggest point of JavaScript frameworks is to keep the UI in the same state as your application state. Where we are really going to start benefitting from the scope system we have created is when we implement it on top of the DOM
+

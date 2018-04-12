@@ -4,7 +4,7 @@
 
 To start, copy the following code into a JS file.
 
-```js
+```javascript
 //should take in an objects with an r,g,and b property and return the hex string
 function rgbToHex(/*Implement*/) {
   //implement
@@ -38,7 +38,7 @@ Then implement the two blank functions to convert from a hex string to a rgb obj
 
 ## Exercise 1 Solution
 
-```js
+```javascript
 //should take in an objects with an r,g,and b property and return the hex string
 function rgbToHex(r: number, g: number, b: number) : string {
     return r.toString(16) + g.toString(16) + b.toString(16);
@@ -78,7 +78,7 @@ Convert the code of the solution to Exercise 1 to use an interface for the RGB o
 
 ## Exercise 2 Solution
 
-```js
+```javascript
 interface RGBObject {
     r: number,
     g: number,
@@ -117,3 +117,4 @@ let color = {
 console.log(rgbToHex({ r: 255, g: 100, b: 55})); //should be "ff6437"
 console.log(hexToRgb('00ff00')); //should be {r: 0, g: 255, b: 0}
 ```
+
