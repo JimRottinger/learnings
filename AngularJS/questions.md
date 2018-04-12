@@ -33,6 +33,10 @@ things until you get the results you need.
  8. When calling digest on a child scope, what watchers should be checked?
  9. Explain how a scope can have a different protypal parent and hierarchical parent
  10. What is an isolated scope?
+ 11. Explain how Angular's pub/sub event system is tied to the scope hierarchy
+ 12. What is the difference between $emit and $broadcast?
+ 13. How is data sent along with the event? What information gets included automatically?
+ 14. Explain how the Angular events are modelled after DOM events.
 
 ## Answers
 

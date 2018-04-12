@@ -97,3 +97,17 @@ At the moment, our event object only contains one attribute - the event name. Th
 Much like the way we often want to stop the propagation on javascript DOM events, it would be nice if we had a way to stop the propogation of scope events in Angular. Broadcasted events cannot be stopped, however, we want to have a `stopPropagation` function for emitted events to prevent them from bubbling up if its already been handled. We want to ensure that even if an event is stopped, it still gets handled by all listeners on the current scope.
 
 Another DOM behavior that we want to mimic is prevent the default behavior on events such as pereventing links from changing the url. It does this through `preventDefault`. But what default behavior do we want to prevent on scope events? Browsers have default behaviors, our scope does not. As it turns out, our preventDefault function will not affect the scope event system behavior. It simply meant to be a carrier of boolean information to be used later on. An example of when it can be used is by a custom directive to determine if it should trigger some default browser behavior.
+
+## Summary
+
+We have now implemented the Angular scope system in full. In this chapter specifically, we covered:
+ * How Angular implements its scope system using pub/sub
+ * How it is tied to the scope hierarchy
+ * The difference between broadcasting an event and emitting one
+ * What information is contained within the event object
+ * How the scope attributes are modelled after the DOM event model
+ * When and how the scope events can be stopped.
+
+In a vacuum, what we have created thus far is an object creation and management system. Remember that the scope started off as a plain-old JavaScript object that we added a lot of functionality to. This functionality includes registering watchers to detect changes in the object properties, running a digest to see if anything has changed, executing the listener functions, and an event system to broadcast or emit an event. We also implemented ways to run functions in the context of a scope, including eval, apply, evalAsync, and applyAsync.
+
+Even though scope is a core part of how Angular works, we are still a far cry from having a full framework. The biggest point of JavaScript frameworks is to keep the UI in the same state as your application state. Where we are really going to start benefitting from the scope system we have created is when we implement it on top of the DOM

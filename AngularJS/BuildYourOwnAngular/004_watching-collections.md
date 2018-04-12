@@ -4,8 +4,7 @@ In Chapter 1 we implemented two different strategies for identifying changes in 
 
 Of course, this is already possible with a watch expression when comparing by value, however, this is essentially an optimized version of that because it only cares about a single level of nesting. It does not need to watch the entire object graph. From the author:
 
-> This chapter is all about $watchCollection. While conceptually simple, the function packs a
-punch. By knowing how it works you’ll be able to use it to full effect. Implementing $watchCollection also serves as a case study for writing watches that specialize in certain kinds of data structures, which is something you may need to do when building Angular applications.
+> This chapter is all about $watchCollection. While conceptually simple, the function packs a punch. By knowing how it works you’ll be able to use it to full effect. Implementing $watchCollection also serves as a case study for writing watches that specialize in certain kinds of data structures, which is something you may need to do when building Angular applications.
 
 The function signature of $watchCollection is going to be nearly identical to that of the $watch function. Within, it will actually delegate to the $watch function, but we will supply our own, locally created versions of the watch and listener function.
 
