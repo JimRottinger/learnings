@@ -123,3 +123,50 @@ this.peek = function() {
 ```
 
 We are also going to use peek for scientific notation. Exponents can be positive or negative, and a number must follow the e. Our if-else logic is going to get a little messy, but that is the nature of parsers. Having a lot of tests helps here
+
+## Parsing Strings
+
+For strings, we want to be able to parse both single and double quotes. We just implemented a `readNumber` function, now lets add a `readString` function to our lexer.
+
+```js
+this.readString = function(endChar) {
+  this.index++;
+  var string = '';
+  while (this.index < this.text.length) {
+    var ch = this.text.charAt(this.index);
+
+    if (ch === endChar) {
+      this.index++;
+      this.tokens.push({
+        text: string,
+        value: string
+      });
+      return;
+    } else {
+      string+= ch;
+    }
+    this.index++;
+  }
+  throw 'Unmatched quote';
+};
+```
+
+This was fairly easy, however, we run into an issue in our compiler. Our parser will parse `"abc"` into `abc`. But when our function returns `abc`, it will throw an undefined variable error. When we return a string, we need to escape it in single quotes before returning it.
+
+```js
+this.escape = function(value) {
+  if (_.isString(value)) {
+    return '\'' + value + '\'';
+  } else {
+    return value;
+  }
+};
+```
+
+Speaking of escaping, we also want to be able to support escape characters such as `\n`, as well as unicode escape sequences such as `\u00A0`. We will do this by reading everything after the `\` and then converting it to the corresponding character. For single character escapes, we will replace it with:
+
+```
+var ESCAPES = {'n':'\n', 'f':'\f', 'r':'\r', 't':'\t', 'v':'\v', '\'':'\'', '"':'"'};
+```
+
+There is some work we have to do in the compiler to ensure that our string isn't escaped early. Don't worry too much about that, just know that it involves converting the chracters to their unicode version and then converting them to strings.
