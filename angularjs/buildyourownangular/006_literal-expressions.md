@@ -170,3 +170,7 @@ var ESCAPES = {'n':'\n', 'f':'\f', 'r':'\r', 't':'\t', 'v':'\v', '\'':'\'', '"':
 ```
 
 There is some work we have to do in the compiler to ensure that our string isn't escaped early. Don't worry too much about that, just know that it involves converting the chracters to their unicode version and then converting them to strings.
+
+## Parsing true, false, and null
+
+The third type of literal we'll add support for are boolean literals such as true and false. They are so-called identifier tokens, meaning they look like strings but mean something for than that. That beign said, we need a way to discern between strings and identifiers. This will happen in the AST builder. We will maintain a list of constants there to let it know that certain strings are actually predefined literals.
