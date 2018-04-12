@@ -10,7 +10,7 @@
     * 01\_computational-thinking
       * [Notes on Week 2](datascience/foundations-of-data-science/01_computational-thinking/02_week2.md)
       * [Notes on Week 1](datascience/foundations-of-data-science/01_computational-thinking/01_week1.md)
-* angularjs
+* AngularJS
   * buildyourownangular
     * [Chapter 6 - Literal Expressions](angularjs/buildyourownangular/006_literal-expressions.md)
     * [Chapter 4 - Watching Collections](angularjs/buildyourownangular/004_watching-collections.md)
